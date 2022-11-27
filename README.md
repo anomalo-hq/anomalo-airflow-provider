@@ -16,13 +16,13 @@ Simply install `apache-airflow-providers-anomalo` into your airflow instance. Yo
 From the airflow UI, go to Admin > Connections and hit the `+` button at the top to add a new connection.
 
 From the "Connection Type" drop down, select "Anomalo".
-![](https://github.com/anomalo-hq/anomalo-airflow-provider/blob/main/docs/connection.png?raw=True)
+<img src="https://github.com/anomalo-hq/anomalo-airflow-provider/blob/main/docs/connection.png?raw=True">
 Then fill in the fields for "Connection Id" (`anomalo-default` is the default connection id), "Host", and "API Secret Token".
 
 ## Usage
 
 1. Obtain Anomalo table name from GUI. For example
-   ![](https://github.com/anomalo-hq/anomalo-airflow-provider/blob/main/docs/table.png?raw=True)
+   <img src="https://github.com/anomalo-hq/anomalo-airflow-provider/blob/main/docs/table.png?raw=True">
    would be `public-bq.covid19_nyt.us_counties`
 
 2. This package includes 3 different operators. You can find documentation for them on the operator code itself.
