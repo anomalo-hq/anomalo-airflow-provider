@@ -1,0 +1,36 @@
+[project]
+requires-python = ">=3.10"
+
+[tool.poetry]
+name = "apache-airflow-providers-anomalo"
+version = "0.1.5"
+description = "An Apache Airflow provider for Anomalo"
+license = "Apache-2.0"
+authors = ["Anomalo <opensource@anomalo.com>"]
+readme = "README.md"
+repository = "https://github.com/anomalo-hq/anomalo-airflow-provider"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Apache Airflow",
+    "Framework :: Apache Airflow :: Provider",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+]
+packages = [{include = "airflow", from = "src"}]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+anomalo = "^0.0.7"
+
+[tool.poetry.dev-dependencies]
+pre-commit = "^2.20.0"
+black = "^22.6.0"
+apache-airflow = "^2.3.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.plugins]
+[tool.poetry.plugins."apache_airflow_provider"]
+"provider_info" = "airflow.providers.anomalo.__init__:get_provider_info"
