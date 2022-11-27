@@ -9,7 +9,11 @@ These operators were created and tested with
 
 ### Installation
 
-Simply install `apache-airflow-providers-anomalo` into your airflow instance. You can validate that it is correctly installed by running `airflow providers list` on the command line and seeing if `apache-airflow-providers-anomalo` is a listed providers package.
+
+```
+pip install apache-airflow-providers-anomalo
+```
+You can validate that it is correctly installed by running `airflow providers list` on the command line and seeing if `apache-airflow-providers-anomalo` is a listed providers package.
 
 ### Airflow Setup
 
