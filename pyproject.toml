@@ -3,7 +3,7 @@ requires-python = ">=3.10"
 
 [tool.poetry]
 name = "apache-airflow-providers-anomalo"
-version = "0.1.5"
+version = "0.1.6"
 description = "An Apache Airflow provider for Anomalo"
 license = "Apache-2.0"
 authors = ["Anomalo <opensource@anomalo.com>"]

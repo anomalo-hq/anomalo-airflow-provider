@@ -3,7 +3,7 @@ def get_provider_info():
         "package-name": "apache-airflow-providers-anomalo",
         "name": "Anomalo Provider",
         "description": "An Apache Airflow provider for Anomalo.",
-        "versions": ["0.1.5"],
+        "versions": ["0.1.6"],
         "connection-types": [
             {
                 "hook-class-name": "airflow.providers.anomalo.hooks.anomalo.AnomaloHook",
