@@ -1,6 +1,7 @@
 from typing import Any
 
 from airflow.hooks.base import BaseHook
+
 from anomalo import Client
 
 

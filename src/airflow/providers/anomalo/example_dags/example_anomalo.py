@@ -1,12 +1,12 @@
 from airflow.models import DAG
 from airflow.operators.empty import EmptyOperator
-from airflow.utils.dates import days_ago
-
 from airflow.providers.anomalo.operators.anomalo import (
     AnomaloPassFailOperator,
     AnomaloRunCheckOperator,
 )
 from airflow.providers.anomalo.sensors.anomalo import AnomaloJobCompleteSensor
+from airflow.utils.dates import days_ago
+
 
 args = {
     "owner": "AL",
@@ -19,7 +19,6 @@ with DAG(
     description="Simple Anomalo Airflow operator example",
     schedule_interval="@daily",
 ) as dag:
-
     ingest_transform_data = EmptyOperator(task_id="ingest_transform_data")
 
     anomalo_run = AnomaloRunCheckOperator(
