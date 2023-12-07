@@ -24,3 +24,22 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: "3.11.5"
+
+      - name: Install Poetry
+        uses: python-poetry/install-poetry@v1.7.1
+        with:
+          version: 1.7.1
+
+      - name: Install dependencies
+        run: poetry install --no-dev
+
+      - name: Install ruff
+        run: pip install ruff
+
+      - name: Run ruff
+        run: ruff .
+        if: always()
+
+      - name: Run ruff format
+        run: ruff format --check .
+        if: always()
