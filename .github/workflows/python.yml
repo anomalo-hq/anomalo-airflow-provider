@@ -12,26 +12,16 @@ jobs:
     timeout-minutes: 45
 
     steps:
-      - name: Cancel Previous Runs
-        uses: styfle/cancel-workflow-action@0.12.0
-        with:
-          access_token: ${{ github.token }}
-
       - name: Checkout Code
         uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.11.5"
-
-      - name: Install Poetry
-        uses: python-poetry/install-poetry@v1.7.1
-        with:
-          version: 1.7.1
+          python-version: 3.11
 
       - name: Install dependencies
-        run: poetry install --no-dev
+        run: poetry install
 
       - name: Install ruff
         run: pip install ruff
