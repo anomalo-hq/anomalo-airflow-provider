@@ -3,7 +3,7 @@ A set of native Airflow operators for [Anomalo](https://www.anomalo.com/)
 
 ### Compatibility
 These operators were created and tested with
-* Python 3.10
+* Python 3.8-3.10
 * Airflow 2.3+
 * Anomalo python client 0.0.7
 

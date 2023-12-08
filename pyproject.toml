@@ -1,5 +1,5 @@
 [project]
-requires-python = ">=3.10"
+requires-python = ">=3.8"
 
 [tool.poetry]
 name = "apache-airflow-providers-anomalo"
@@ -19,8 +19,9 @@ classifiers = [
 packages = [{include = "airflow", from = "src"}]
 
 [tool.poetry.dependencies]
-python = "^3.10"
+python = "^3.8"
 anomalo = "^0.0.7"
+importlib-resources = "^6.1.1"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.20.0"
