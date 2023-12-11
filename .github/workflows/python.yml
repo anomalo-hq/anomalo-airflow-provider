@@ -9,6 +9,7 @@ on:
 jobs:
   check-python-code-quality:
     runs-on: ubuntu-latest
+
     timeout-minutes: 45
 
     steps:
@@ -19,6 +20,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: 3.11
+          cache: 'poetry'
 
       - name: Install dependencies
         run: poetry install
