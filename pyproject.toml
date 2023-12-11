@@ -26,6 +26,9 @@ anomalo = "^0.0.7"
 poetry = "^1.7.0"
 pre-commit = "^3.5.0"
 
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.1.7"
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
