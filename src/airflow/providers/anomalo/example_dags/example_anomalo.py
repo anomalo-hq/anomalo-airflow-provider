@@ -24,7 +24,7 @@ with DAG(
 
     anomalo_run = AnomaloRunCheckOperator(
         task_id="AnomaloRunCheck",
-        table_name="public-bq.crypto_bitcoin.outputs",
+        table_name="public-bq.austin_bikeshare.bikeshare_stations",
     )
 
     anomalo_sensor = AnomaloJobCompleteSensor(
@@ -37,7 +37,7 @@ with DAG(
 
     anomalo_validate = AnomaloPassFailOperator(
         task_id="AnomaloPassFail",
-        table_name="public-bq.crypto_bitcoin.outputs",
+        table_name="public-bq.austin_bikeshare.bikeshare_stations",
         must_pass=[
             "data_freshness",
             "data_volume",

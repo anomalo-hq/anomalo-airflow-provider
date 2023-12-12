@@ -1,4 +1,5 @@
 from datetime import date, timedelta
+from typing import Callable, Mapping, Optional
 
 from airflow.models import BaseOperator
 
@@ -10,23 +11,22 @@ def anomalo_today() -> date:
     return date.today() - timedelta(1)
 
 
-class AnomaloPassFailOperator(BaseOperator):
+class AnomaloCheckJobStatusOperator(BaseOperator):
     """
-    Validate whether checks on a given table pass or fail.
+    Check the results of the most recent Job that ran on a table.
 
     :param table_name: the full name of the table in Anomalo.
     :param must_pass: a list of checks that must pass for this task to succeed.
     :param run_date: the run date of the checks. If not specified, defaults to the current day of checks.
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
+
     """
 
-    def __init__(
-        self, table_name, must_pass, run_date:date=None, anomalo_conn_id="anomalo_default", *args, **kwargs
-    ):
+    def __init__(self, table_name, status_checker:Callable[[Mapping], bool], run_date:Optional[date]=None, anomalo_conn_id="anomalo_default", *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.anomalo_conn_id = anomalo_conn_id
         self.table_name = table_name
-        self.must_pass = must_pass
+        self.status_checker = status_checker
         self.run_date = run_date
 
     def execute(self, context):
@@ -38,6 +38,33 @@ class AnomaloPassFailOperator(BaseOperator):
         )[0]["latest_run_checks_job_id"]
         results = api_client.get_run_result(job_id=my_job_id)
 
+        if not self.status_checker(results):
+            raise AirflowException("Anomolo Job did not pass status check")
+        
+        return results
+
+
+class AnomaloPassFailOperator(AnomaloCheckJobStatusOperator):
+    """
+    Validate whether checks on a given table pass or fail.
+
+    :param table_name: the full name of the table in Anomalo.
+    :param must_pass: a list of checks that must pass for this task to succeed.
+    :param run_date: the run date of the checks. If not specified, defaults to the current day of checks.
+    :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
+    """
+    def __init__(
+        self, table_name, must_pass, run_date:date=None, anomalo_conn_id="anomalo_default", *args, **kwargs
+    ):
+        self.must_pass = must_pass
+        super().__init__(table_name=table_name,
+                         status_checker=self.status_checker,
+                         run_date=run_date,
+                         anomalo_conn_id=anomalo_conn_id,
+                         *args, 
+                         **kwargs)
+
+    def status_checker(self, results:Mapping) -> bool:
         check_runs = results["check_runs"]
         failed_check_types = {
             check_type
@@ -51,9 +78,10 @@ class AnomaloPassFailOperator(BaseOperator):
             self.log.error(
                 f"check type(s): {', '.join(failed_check_types)} for table {self.table_name} did not pass"
             )
-            raise AirflowException("Anomalo checks have failed")
+            return False
+        else:
+            return True
 
-        return results
 
 
 class AnomaloRunCheckOperator(BaseOperator):
