@@ -11,9 +11,9 @@ def anomalo_today() -> date:
     return date.today() - timedelta(1)
 
 
-class AnomaloCheckJobStatusOperator(BaseOperator):
+class AnomaloCheckRunResultOperator(BaseOperator):
     """
-    Check the results of the most recent Job that ran on a table.
+    Check the results of the most recent job that ran on a table.
 
     :param table_name: the full name of the table in Anomalo.
     :param status_checker: A function that takes in a run result and returns True if this check should pass and False otherwise.
@@ -43,7 +43,7 @@ class AnomaloCheckJobStatusOperator(BaseOperator):
         return results
 
 
-class AnomaloPassFailOperator(AnomaloCheckJobStatusOperator):
+class AnomaloPassFailOperator(AnomaloCheckRunResultOperator):
     """
     Validate whether checks on a given table pass or fail.
 
