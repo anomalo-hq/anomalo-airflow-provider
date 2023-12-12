@@ -16,10 +16,9 @@ class AnomaloCheckJobStatusOperator(BaseOperator):
     Check the results of the most recent Job that ran on a table.
 
     :param table_name: the full name of the table in Anomalo.
-    :param must_pass: a list of checks that must pass for this task to succeed.
+    :param status_checker: A function that takes in a run result and returns True if this check should pass and False otherwise.
     :param run_date: the run date of the checks. If not specified, defaults to the current day of checks.
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
-
     """
 
     def __init__(self, table_name, status_checker:Callable[[Mapping], bool], run_date:Optional[date]=None, anomalo_conn_id="anomalo_default", *args, **kwargs):
