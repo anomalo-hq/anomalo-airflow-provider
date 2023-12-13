@@ -22,11 +22,8 @@ packages = [{include = "airflow", from = "src"}]
 python = "^3.10"
 anomalo = "^0.0.7"
 
-[tool.poetry.dev-dependencies]
-poetry = "^1.7.0"
-pre-commit = "^3.5.0"
-
 [tool.poetry.group.dev.dependencies]
+pre-commit = "^3.5.0"
 ruff = "^0.1.7"
 
 [build-system]
