@@ -1,8 +1,7 @@
 from datetime import date, timedelta
 
-from airflow.models import BaseOperator
-
 from airflow import AirflowException
+from airflow.models import BaseOperator
 from airflow.providers.anomalo.hooks.anomalo import AnomaloHook
 
 
