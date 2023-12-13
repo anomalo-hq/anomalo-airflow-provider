@@ -1,9 +1,8 @@
 from datetime import date, timedelta
 from typing import Callable, Mapping, Optional
 
-from airflow.models import BaseOperator
-
 from airflow import AirflowException
+from airflow.models import BaseOperator
 from airflow.providers.anomalo.hooks.anomalo import AnomaloHook
 
 
