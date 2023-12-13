@@ -20,7 +20,15 @@ class AnomaloCheckRunResultOperator(BaseOperator):
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
     """
 
-    def __init__(self, table_name, status_checker:Callable[[Mapping], bool], run_date:Optional[date]=None, anomalo_conn_id="anomalo_default", *args, **kwargs):
+    def __init__(
+        self,
+        table_name,
+        status_checker: Callable[[Mapping], bool],
+        run_date: Optional[date] = None,
+        anomalo_conn_id="anomalo_default",
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.anomalo_conn_id = anomalo_conn_id
         self.table_name = table_name
@@ -29,7 +37,11 @@ class AnomaloCheckRunResultOperator(BaseOperator):
 
     def execute(self, context):
         api_client = AnomaloHook(anomalo_conn_id=self.anomalo_conn_id).get_client()
-        run_date = self.run_date.strftime("%Y-%m-%d") if self.run_date else anomalo_today().strftime("%Y-%m-%d")
+        run_date = (
+            self.run_date.strftime("%Y-%m-%d")
+            if self.run_date
+            else anomalo_today().strftime("%Y-%m-%d")
+        )
         table_id = api_client.get_table_information(table_name=self.table_name)["id"]
         my_job_id = api_client.get_check_intervals(
             table_id=table_id, start=run_date, end=None
@@ -38,7 +50,7 @@ class AnomaloCheckRunResultOperator(BaseOperator):
 
         if not self.status_checker(results):
             raise AirflowException("Anomolo Job did not pass status check")
-        
+
         return results
 
 
@@ -51,18 +63,27 @@ class AnomaloPassFailOperator(AnomaloCheckRunResultOperator):
     :param run_date: the run date of the checks. If not specified, defaults to the current day of checks.
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
     """
+
     def __init__(
-        self, table_name, must_pass, run_date:date=None, anomalo_conn_id="anomalo_default", *args, **kwargs
+        self,
+        table_name,
+        must_pass,
+        run_date: date = None,
+        anomalo_conn_id="anomalo_default",
+        *args,
+        **kwargs,
     ):
         self.must_pass = must_pass
-        super().__init__(table_name=table_name,
-                         status_checker=self.status_checker,
-                         run_date=run_date,
-                         anomalo_conn_id=anomalo_conn_id,
-                         *args, 
-                         **kwargs)
+        super().__init__(
+            table_name=table_name,
+            status_checker=self.status_checker,
+            run_date=run_date,
+            anomalo_conn_id=anomalo_conn_id,
+            *args,
+            **kwargs,
+        )
 
-    def status_checker(self, results:Mapping) -> bool:
+    def status_checker(self, results: Mapping) -> bool:
         check_runs = results["check_runs"]
         failed_check_types = {
             check_type
@@ -81,7 +102,6 @@ class AnomaloPassFailOperator(AnomaloCheckRunResultOperator):
             return True
 
 
-
 class AnomaloRunCheckOperator(BaseOperator):
     """
     Triggers a job that runs checks on a given table.
@@ -95,7 +115,15 @@ class AnomaloRunCheckOperator(BaseOperator):
 
     # todo cache? better name?
 
-    def __init__(self, table_name, run_date:date = None, check_ids=None, anomalo_conn_id="anomalo_default", *args, **kwargs):
+    def __init__(
+        self,
+        table_name,
+        run_date: date = None,
+        check_ids=None,
+        anomalo_conn_id="anomalo_default",
+        *args,
+        **kwargs,
+    ):
         super().__init__(*args, **kwargs)
         self.anomalo_conn_id = anomalo_conn_id
         self.table_name = table_name
@@ -105,9 +133,15 @@ class AnomaloRunCheckOperator(BaseOperator):
     def execute(self, context):
         api_client = AnomaloHook(anomalo_conn_id=self.anomalo_conn_id).get_client()
 
-        run_date_str = self.run_date.strftime("%Y-%m-%d") if self.run_date else anomalo_today().strftime("%Y-%m-%d")
-        
+        run_date_str = (
+            self.run_date.strftime("%Y-%m-%d")
+            if self.run_date
+            else anomalo_today().strftime("%Y-%m-%d")
+        )
+
         table_id = api_client.get_table_information(table_name=self.table_name)["id"]
-        run = api_client.run_checks(table_id=table_id, interval_id=run_date_str, check_ids=self.check_ids)
+        run = api_client.run_checks(
+            table_id=table_id, interval_id=run_date_str, check_ids=self.check_ids
+        )
         self.log.info(f"Triggered Anomalo checks for {self.table_name}")
         return run["run_checks_job_id"]
