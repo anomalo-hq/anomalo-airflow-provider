@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Mapping
 
 from airflow.hooks.base import BaseHook
 
@@ -16,7 +16,7 @@ class AnomaloHook(BaseHook):
     hook_name = "Anomalo"
 
     @staticmethod
-    def get_connection_form_widgets() -> dict[str, Any]:
+    def get_connection_form_widgets() -> Mapping[str, Any]:
         """Returns connection widgets to add to connection form"""
         from flask_appbuilder.fieldwidgets import BS3PasswordFieldWidget
         from flask_babel import lazy_gettext
@@ -29,7 +29,7 @@ class AnomaloHook(BaseHook):
         }
 
     @staticmethod
-    def get_ui_field_behaviour() -> dict[str, Any]:
+    def get_ui_field_behaviour() -> Mapping[str, Any]:
         """Returns custom field behaviour"""
         return {
             "hidden_fields": ["login", "password", "schema", "extra", "uri", "port"],
