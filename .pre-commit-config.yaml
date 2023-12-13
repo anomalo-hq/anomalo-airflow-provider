@@ -22,4 +22,4 @@ repos:
     rev: v3.3.1
     hooks:
       - id: pyupgrade
-        args: ["--py310-plus", "--keep-mock"]
+        args: ["--py38-plus", "--keep-mock"]
