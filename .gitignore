@@ -3,3 +3,6 @@
 
 # Distribution / packaging
 dist/
+
+# library caches
+.ruff_cache
