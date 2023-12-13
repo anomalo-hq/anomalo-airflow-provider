@@ -26,9 +26,9 @@ jobs:
         run: poetry install
 
       - name: Run ruff
-        run: ruff .
+        run: $(poetry env info -p)/bin/ruff .
         if: always()
 
       - name: Run ruff format
-        run: ruff format --check .
+        run: $(poetry env info -p)/bin/ruff format --check .
         if: always()
