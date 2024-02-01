@@ -1,4 +1,4 @@
-from airflow import AirflowException
+from airflow.exceptions import AirflowException
 from airflow.providers.anomalo.hooks.anomalo import AnomaloHook
 from airflow.sensors.base import BaseSensorOperator
 
