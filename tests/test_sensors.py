@@ -13,7 +13,7 @@ def test_job_complete_sensor_true(mocker, run_result, complete):
     
     sensor = AnomaloJobCompleteSensor(job_id="foo", task_id="bar")
     mock_client.get_run_result.return_value = run_result
-    assert(sensor.poke(context=None) == complete)
+    assert sensor.poke(context=None) == complete 
 
     mock_client.get_run_result.assert_called_with("foo")
 

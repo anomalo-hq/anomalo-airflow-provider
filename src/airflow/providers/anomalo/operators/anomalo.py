@@ -113,8 +113,6 @@ class AnomaloRunCheckOperator(BaseOperator):
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
     """
 
-    # todo cache? better name?
-
     def __init__(
         self,
         table_name,
