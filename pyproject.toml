@@ -38,10 +38,6 @@ pytest = "^8.0.0"
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-
-
-
-
 [tool.poetry.plugins]
 [tool.poetry.plugins."apache_airflow_provider"]
 "provider_info" = "airflow.providers.anomalo.__init__:get_provider_info"
