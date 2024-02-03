@@ -6,8 +6,6 @@ from airflow.providers.anomalo.sensors.anomalo import AnomaloJobCompleteSensor
                          [({"check_runs": [{"results_pending": False}]}, True), 
                           ({"check_runs": [{"results_pending": True}]}, False)])
 def test_job_complete_sensor_true(mocker, run_result, complete):
-
-    mocker.patch('airflow.providers.anomalo.sensors.anomalo.BaseSensorOperator')
     mock_hook = mocker.patch("airflow.providers.anomalo.sensors.anomalo.AnomaloHook")
     mock_client = mock_hook.return_value.get_client.return_value = mocker.MagicMock()
     
@@ -18,7 +16,6 @@ def test_job_complete_sensor_true(mocker, run_result, complete):
     mock_client.get_run_result.assert_called_with("foo")
 
 def test_job_complete_sensor_xcom(mocker):
-    mocker.patch('airflow.providers.anomalo.sensors.anomalo.BaseSensorOperator')
     mock_hook = mocker.patch("airflow.providers.anomalo.sensors.anomalo.AnomaloHook")
     mock_client = mock_hook.return_value.get_client.return_value = mocker.MagicMock()
     mock_context = mocker.MagicMock()
