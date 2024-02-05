@@ -94,8 +94,6 @@ def create_mock_run_result(type_to_success: List[Tuple[str, bool]]) -> Mapping:
     ],
 )
 def test_check_pass_fail_operator(mocker, results, must_pass, expect_passes):
-    print(results)
-
     check_pass = AnomaloPassFailOperator(
         table_name="foo", run_date=date(2023, 2, 1), must_pass=must_pass, task_id="bar"
     )
