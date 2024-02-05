@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from typing import Callable, Mapping, Optional
 
-from airflow import AirflowException
+from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.providers.anomalo.hooks.anomalo import AnomaloHook
 
@@ -112,8 +112,6 @@ class AnomaloRunCheckOperator(BaseOperator):
     :param check_ids: (Optional) the ids of the checks to run. If not specified, all checks will be run, except DataFreshness and DataVolume.
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
     """
-
-    # todo cache? better name?
 
     def __init__(
         self,
