@@ -35,3 +35,15 @@ Then fill in the fields for "Connection Id" (`anomalo-default` is the default co
    3. Validate table checks: `airflow.providers.anomalo.operators.anomalo.AnomaloPassFailOperator`
 
 3. See `anomalo_dag_example.py` for usage example
+
+## Releasing to PyPi
+
+To release a new version to PyPi, you will need to
+
+1. Configure your pypi token by running:
+   ```poetry config pypi-token.pypi [token here]```
+   The token can be found in the AWS secrets manager
+2. Bump the version number in pyproject.toml. Make sure that this change is committed.
+3. run
+   ```poetry publish --build```
+
