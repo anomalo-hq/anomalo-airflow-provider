@@ -21,9 +21,11 @@ with DAG(
 ) as dag:
     ingest_transform_data = EmptyOperator(task_id="ingest_transform_data")
 
+    my_table_name = "public-bq.austin_bikeshare.bikeshare_stations"
+
     anomalo_run = AnomaloRunCheckOperator(
         task_id="AnomaloRunCheck",
-        table_name="public-bq.austin_bikeshare.bikeshare_stations",
+        table_name=my_table_name,
     )
 
     anomalo_sensor = AnomaloJobCompleteSensor(
@@ -36,7 +38,8 @@ with DAG(
 
     anomalo_validate = AnomaloPassFailOperator(
         task_id="AnomaloPassFail",
-        table_name="public-bq.austin_bikeshare.bikeshare_stations",
+        table_name=my_table_name,
+        xcom_job_id_task=anomalo_run.task_id,
         must_pass=[
             "data_freshness",
             "data_volume",
