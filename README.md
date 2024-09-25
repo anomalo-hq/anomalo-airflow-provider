@@ -34,7 +34,7 @@ Then fill in the fields for "Connection Id" (`anomalo-default` is the default co
    2. Job Sensor `airflow.providers.anomalo.sensors.anomalo.AnomaloJobCompleteSensor`
    3. Validate table checks: `airflow.providers.anomalo.operators.anomalo.AnomaloPassFailOperator`
 
-3. See `anomalo_dag_example.py` for usage example
+3. See `example_anomalo.py` for usage example
 
 ## Releasing to PyPi
 
