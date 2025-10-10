@@ -1,10 +1,11 @@
 # Apache Airflow Provider for Anomalo
 A set of native Airflow operators for [Anomalo](https://www.anomalo.com/)
 
-### Compatibility
-These operators were created and tested with
-* Python 3.9+
-* Airflow 2.8+
+### Requirements
+
+python >=3.9.0
+airflow >=2.8.0
+
 
 ### Installation
 
