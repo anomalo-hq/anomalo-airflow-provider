@@ -3,7 +3,7 @@ import pytest
 
 from datetime import date
 
-from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowFailException
 from airflow.providers.anomalo.operators.anomalo import (
     AnomaloPassFailOperator,
     AnomaloRunCheckOperator,
@@ -53,7 +53,7 @@ def test_check_run_result_operator(mocker, status_checker, expect_passes):
     try:
         results = check_run.execute(context=None)
         actual_passes = True
-    except AirflowException:
+    except AirflowFailException:
         actual_passes = False
 
     mock_client.get_table_information.assert_called_with(table_name="foo")
