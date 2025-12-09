@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 from typing import Callable, Mapping, Optional
 
-from airflow.exceptions import AirflowException
+from airflow.exceptions import AirflowFailException
 from airflow.models import BaseOperator
 from airflow.providers.anomalo.hooks.anomalo import AnomaloHook
 
@@ -61,7 +61,7 @@ class AnomaloCheckRunResultOperator(BaseOperator):
         results = self.api_client.get_run_result(job_id=my_job_id)
 
         if not self.status_checker(results):
-            raise AirflowException("Anomolo Job did not pass status check")
+            raise AirflowFailException("Anomolo Job did not pass status check")
 
         return results
 
