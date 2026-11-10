@@ -1,6 +1,10 @@
 from typing import Any, Mapping
 
-from airflow.hooks.base import BaseHook
+
+try:
+    from airflow.sdk import BaseHook
+except ImportError:
+    from airflow.hooks.base import BaseHook
 
 from anomalo import Client
 

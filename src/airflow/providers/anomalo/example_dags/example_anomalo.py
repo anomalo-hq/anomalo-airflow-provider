@@ -1,23 +1,32 @@
-from airflow.models import DAG
-from airflow.operators.empty import EmptyOperator
+import pendulum
+
+
+try:
+    from airflow.sdk import DAG
+except ImportError:
+    from airflow.models import DAG
+try:
+    from airflow.providers.standard.operators.empty import EmptyOperator
+except ImportError:
+    from airflow.operators.empty import EmptyOperator
 from airflow.providers.anomalo.operators.anomalo import (
     AnomaloPassFailOperator,
     AnomaloRunCheckOperator,
 )
 from airflow.providers.anomalo.sensors.anomalo import AnomaloJobCompleteSensor
-from airflow.utils.dates import days_ago
 
 
 args = {
     "owner": "AL",
-    "start_date": days_ago(1),
+    "start_date": pendulum.datetime(2024, 1, 1, tz="UTC"),
 }
 
 with DAG(
     dag_id="AnomaloDAG",
     default_args=args,
     description="Simple Anomalo Airflow operator example",
-    schedule_interval="@daily",
+    schedule="@daily",
+    catchup=False,
 ) as dag:
     ingest_transform_data = EmptyOperator(task_id="ingest_transform_data")
 

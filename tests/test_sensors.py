@@ -27,9 +27,9 @@ def test_job_complete_sensor_xcom(mocker):
     mock_context = mocker.MagicMock()
 
     sensor = AnomaloJobCompleteSensor(xcom_job_id_task="foo_task", task_id="bar")
-    xcom_pull = mocker.patch.object(sensor, "xcom_pull", return_value="foo")
+    mock_context["ti"].xcom_pull.return_value = "foo"
 
     sensor.poke(context=mock_context)
 
-    xcom_pull.assert_called()
+    mock_context["ti"].xcom_pull.assert_called()
     mock_client.get_run_result.assert_called_with("foo")
