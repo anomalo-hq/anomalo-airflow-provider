@@ -3,8 +3,8 @@ A set of native Airflow operators for [Anomalo](https://www.anomalo.com/)
 
 ### Requirements
 
-python >=3.9.0
-airflow >=2.8.0
+Python 3.9 to 3.14
+Airflow 2.8 or newer, including Airflow 3
 
 
 ### Installation

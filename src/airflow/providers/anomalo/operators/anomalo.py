@@ -2,7 +2,12 @@ from datetime import date, timedelta
 from typing import Callable, Mapping, Optional
 
 from airflow.exceptions import AirflowException
-from airflow.models import BaseOperator
+
+
+try:
+    from airflow.sdk import BaseOperator
+except ImportError:
+    from airflow.models import BaseOperator
 from airflow.providers.anomalo.hooks.anomalo import AnomaloHook
 
 
@@ -68,8 +73,8 @@ class AnomaloCheckRunResultOperator(BaseOperator):
     def _get_job_id_from_xcom(self, context):
         if not self.xcom_job_id_task:
             return None
-        job_id = self.xcom_pull(
-            context=context, task_ids=self.xcom_job_id_task, key=self.xcom_job_id_key
+        job_id = context["ti"].xcom_pull(
+            task_ids=self.xcom_job_id_task, key=self.xcom_job_id_key
         )
         return job_id
 
