@@ -29,7 +29,7 @@ Then fill in the fields for "Connection Id" (`anomalo-default` is the default co
    ![table](https://github.com/anomalo-hq/anomalo-airflow-provider/blob/main/docs/table.png?raw=True)
    would be `public-bq.covid19_nyt.us_counties`
 
-   Pass the full `warehouse.schema.table` name, including the warehouse. Since version 0.3.0 the provider uses a newer Anomalo client, which rejects a name without the warehouse, such as `covid19_nyt.us_counties`.
+   Pass the full `warehouse.schema.table` name, including the warehouse. Recent versions of the `anomalo` client, which this provider allows from 0.3.0, reject a name without the warehouse, such as `covid19_nyt.us_counties`.
 
 2. This package includes 3 different operators. You can find documentation for them on the operator code itself.
    1. Run checks Operator: `airflow.providers.anomalo.operators.anomalo.AnomaloRunCheckOperator`
