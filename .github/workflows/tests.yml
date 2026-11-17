@@ -1,0 +1,57 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }}, Airflow ${{ matrix.airflow }}
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Oldest supported Python and Airflow
+          - python: "3.9"
+            airflow: "2.8.4"
+          # Last Airflow 2 release
+          - python: "3.11"
+            airflow: "2.10.5"
+          # Airflow 3 on the oldest and newest Python it supports
+          - python: "3.11"
+            airflow: "3.4.0"
+          - python: "3.14"
+            airflow: "3.4.0"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      # Airflow is installed with its published constraints file, which is how
+      # Airflow documents installing it.
+      - name: Install Airflow
+        run: >
+          pip install
+          "apache-airflow==${{ matrix.airflow }}"
+          pytest
+          pytest-mock
+          --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${{ matrix.airflow }}/constraints-${{ matrix.python }}.txt"
+
+      # The provider goes in without the constraints, the way a user adds it
+      # to an Airflow install they already have.
+      - name: Install the provider
+        run: pip install -e .
+
+      - name: Run tests
+        run: pytest
