@@ -33,16 +33,19 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      # uv installs any Python version on any runner image, including ones
+      # that `actions/setup-python` no longer builds for.
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v10.2.0
         with:
           python-version: ${{ matrix.python }}
+          activate-environment: true
 
       # Airflow is installed with its published constraints file, which is how
       # Airflow documents installing it.
       - name: Install Airflow
         run: >
-          pip install
+          uv pip install
           "apache-airflow==${{ matrix.airflow }}"
           pytest
           pytest-mock
@@ -51,7 +54,7 @@ jobs:
       # The provider goes in without the constraints, the way a user adds it
       # to an Airflow install they already have.
       - name: Install the provider
-        run: pip install -e .
+        run: uv pip install -e .
 
       - name: Run tests
         run: pytest
