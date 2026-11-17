@@ -16,8 +16,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # The oldest and newest Airflow versions supported, as the README lists
-        # them. Add a row when support for a new Python or Airflow version lands.
+        # Airflow 2.8 is the oldest version the README supports, and 2.10 is the
+        # last Airflow 2 release. Add a row when support for a new Python or
+        # Airflow version lands.
         include:
           - python: "3.9"
             airflow: "2.8.4"
