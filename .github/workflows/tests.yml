@@ -1,0 +1,56 @@
+name: Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Python ${{ matrix.python }}, Airflow ${{ matrix.airflow }}
+    runs-on: ubuntu-latest
+
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        # Airflow 2.8 is the oldest version the README supports, and 2.10 is the
+        # last Airflow 2 release. Add a row when support for a new Python or
+        # Airflow version lands.
+        include:
+          - python: "3.9"
+            airflow: "2.8.4"
+          - python: "3.11"
+            airflow: "2.10.5"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # uv installs any Python version on any runner image, including ones
+      # that `actions/setup-python` no longer builds for.
+      - name: Set up uv and Python
+        uses: astral-sh/setup-uv@v10.2.0
+        with:
+          python-version: ${{ matrix.python }}
+          activate-environment: true
+
+      # Airflow is installed with its published constraints file, which is how
+      # Airflow documents installing it.
+      - name: Install Airflow
+        run: >
+          uv pip install
+          "apache-airflow==${{ matrix.airflow }}"
+          pytest
+          pytest-mock
+          --constraint "https://raw.githubusercontent.com/apache/airflow/constraints-${{ matrix.airflow }}/constraints-${{ matrix.python }}.txt"
+
+      # The provider goes in without the constraints, the way a user adds it
+      # to an Airflow install they already have.
+      - name: Install the provider
+        run: uv pip install -e .
+
+      - name: Run tests
+        run: pytest
