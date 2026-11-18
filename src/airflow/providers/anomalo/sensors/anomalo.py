@@ -1,6 +1,11 @@
 from airflow.exceptions import AirflowException
 from airflow.providers.anomalo.hooks.anomalo import AnomaloHook
-from airflow.sensors.base import BaseSensorOperator
+
+
+try:
+    from airflow.sdk import BaseSensorOperator
+except ImportError:
+    from airflow.sensors.base import BaseSensorOperator
 
 
 class AnomaloJobCompleteSensor(BaseSensorOperator):
@@ -35,8 +40,8 @@ class AnomaloJobCompleteSensor(BaseSensorOperator):
 
     def poke(self, context):
         api_client = AnomaloHook(anomalo_conn_id=self.anomalo_conn_id).get_client()
-        job_id = self.job_id or self.xcom_pull(
-            context=context, task_ids=self.xcom_job_id_task, key=self.xcom_job_id_key
+        job_id = self.job_id or context["ti"].xcom_pull(
+            task_ids=self.xcom_job_id_task, key=self.xcom_job_id_key
         )
 
         self.log.info(f"checking state of Anomalo job {job_id}")

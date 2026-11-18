@@ -3,8 +3,8 @@ A set of native Airflow operators for [Anomalo](https://www.anomalo.com/)
 
 ### Requirements
 
-python >=3.9.0
-airflow >=2.8.0
+Python 3.9 to 3.14
+Airflow 2.8 or newer, including Airflow 3
 
 
 ### Installation
@@ -28,6 +28,8 @@ Then fill in the fields for "Connection Id" (`anomalo-default` is the default co
 1. Obtain Anomalo table name from GUI. For example
    ![table](https://github.com/anomalo-hq/anomalo-airflow-provider/blob/main/docs/table.png?raw=True)
    would be `public-bq.covid19_nyt.us_counties`
+
+   Pass the full `warehouse.schema.table` name, including the warehouse. Recent versions of the `anomalo` client, which this provider allows from 0.3.0, reject a name without the warehouse, such as `covid19_nyt.us_counties`.
 
 2. This package includes 3 different operators. You can find documentation for them on the operator code itself.
    1. Run checks Operator: `airflow.providers.anomalo.operators.anomalo.AnomaloRunCheckOperator`
