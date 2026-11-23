@@ -1,5 +1,7 @@
 from typing import Any, Mapping
 
+from airflow.exceptions import AirflowException
+
 
 try:
     from airflow.sdk import BaseHook
@@ -12,6 +14,11 @@ from anomalo import Client
 class AnomaloHook(BaseHook):
     """
     Hook for connecting to an Anomalo instance.
+
+    The API token is read from the connection's `api_token` extra (the "API secret
+    token" field in the UI). If that is empty, the connection's password is used,
+    so a connection defined outside the UI (Terraform, environment variables, a
+    secrets backend) can keep the token in the standard password field.
     """
 
     conn_name_attr = "anomalo_conn_id"
@@ -46,8 +53,16 @@ class AnomaloHook(BaseHook):
 
     def get_conn(self):
         params = self.get_connection(conn_id=self.anomalo_conn_id)
-        return Client(api_token=params.extra_dejson["api_token"], host=params.host)
+        return Client(api_token=self._get_api_token(params), host=params.host)
 
     def get_client(self):
-        params = self.get_connection(conn_id=self.anomalo_conn_id)
-        return Client(api_token=params.extra_dejson["api_token"], host=params.host)
+        return self.get_conn()
+
+    def _get_api_token(self, params):
+        api_token = params.extra_dejson.get("api_token") or params.password
+        if not api_token:
+            raise AirflowException(
+                f"Connection {self.anomalo_conn_id!r} has no API token. Set the "
+                "`api_token` extra or the connection password."
+            )
+        return api_token

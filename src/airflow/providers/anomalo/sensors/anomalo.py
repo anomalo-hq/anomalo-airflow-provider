@@ -30,7 +30,7 @@ class AnomaloJobCompleteSensor(BaseSensorOperator):
     ):
         super().__init__(*args, **kwargs)
         if not job_id and not xcom_job_id_task:
-            AirflowException(
+            raise AirflowException(
                 "Must include a job_id or a reference to a task to find the job id from"
             )
         self.anomalo_conn_id = anomalo_conn_id
