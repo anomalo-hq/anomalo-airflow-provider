@@ -1,5 +1,7 @@
 import pytest
 
+from airflow.exceptions import AirflowException
+
 from airflow.providers.anomalo.sensors.anomalo import AnomaloJobCompleteSensor
 
 
@@ -33,3 +35,8 @@ def test_job_complete_sensor_xcom(mocker):
 
     mock_context["ti"].xcom_pull.assert_called()
     mock_client.get_run_result.assert_called_with("foo")
+
+
+def test_job_complete_sensor_requires_a_job_id_or_task():
+    with pytest.raises(AirflowException, match="Must include a job_id"):
+        AnomaloJobCompleteSensor(task_id="bar")

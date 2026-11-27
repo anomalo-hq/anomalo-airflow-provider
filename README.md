@@ -23,6 +23,8 @@ From the "Connection Type" drop down, select "Anomalo".
 ![connection](https://github.com/anomalo-hq/anomalo-airflow-provider/blob/main/docs/connection.png?raw=True)
 Then fill in the fields for "Connection Id" (`anomalo-default` is the default connection id), "Host", and "API Secret Token".
 
+If you define the connection outside the UI (Terraform, an `AIRFLOW_CONN_` environment variable or a secrets backend), you can put the API token in the connection's `password` instead of the `api_token` extra. The `api_token` extra is used when both are set.
+
 ## Usage
 
 1. Obtain Anomalo table name from GUI. For example
@@ -36,7 +38,9 @@ Then fill in the fields for "Connection Id" (`anomalo-default` is the default co
    2. Job Sensor `airflow.providers.anomalo.sensors.anomalo.AnomaloJobCompleteSensor`
    3. Validate table checks: `airflow.providers.anomalo.operators.anomalo.AnomaloPassFailOperator`
 
-3. See `example_anomalo.py` for usage example
+3. `run_date` on `AnomaloRunCheckOperator` and `AnomaloPassFailOperator` accepts a `date` or a `YYYY-MM-DD` string and is templated, so you can tie it to the DAG run instead of the worker's clock. For example, `run_date="{{ ds }}"` for the run's logical date, or `run_date="{{ macros.ds_add(ds, -2) }}"` for a table whose data settles after two days. Left empty, it defaults to the day before the worker's current date.
+
+4. See `example_anomalo.py` for usage example
 
 ## Releasing to PyPi
 

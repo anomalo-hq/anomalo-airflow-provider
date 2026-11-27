@@ -1,5 +1,5 @@
 from datetime import date, timedelta
-from typing import Callable, Mapping, Optional
+from typing import Callable, Mapping, Optional, Union
 
 from airflow.exceptions import AirflowException
 
@@ -15,6 +15,25 @@ def anomalo_today() -> date:
     return date.today() - timedelta(1)
 
 
+def resolve_run_date(run_date: Optional[Union[date, str]]) -> str:
+    """Return the run date as a YYYY-MM-DD string.
+
+    `run_date` is a template field, so it may arrive as a rendered string such
+    as "2026-11-01" (for example from `{{ ds }}`) as well as a `date`. When it
+    is empty, fall back to `anomalo_today()`.
+    """
+    if not run_date:
+        return anomalo_today().strftime("%Y-%m-%d")
+    if isinstance(run_date, date):
+        return run_date.strftime("%Y-%m-%d")
+    try:
+        return date.fromisoformat(str(run_date).strip()).strftime("%Y-%m-%d")
+    except ValueError:
+        raise AirflowException(
+            f"run_date must be a date or a YYYY-MM-DD string, got {run_date!r}"
+        )
+
+
 class AnomaloCheckRunResultOperator(BaseOperator):
     """
     Check the results of the most recent job that ran on a table.
@@ -24,7 +43,8 @@ class AnomaloCheckRunResultOperator(BaseOperator):
     :param job_id: (Optional) The job id of the job to evaluate.
     :param xcom_job_id_task: (Optional) The id of task that wrote the job id to check into xcom.
     :param xcom_job_id_key: (Optional) The xcom key under which the job id was written to.
-    :param run_date: (Optional) The run date of the checks to evaluate.
+    :param run_date: (Optional) The run date of the checks to evaluate, as a `date` or a
+        YYYY-MM-DD string. Templated, so `"{{ ds }}"` or `"{{ macros.ds_add(ds, -2) }}"` work.
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
 
     There are three optional ways to specify which checks to evaluate for pass/fail.
@@ -32,8 +52,10 @@ class AnomaloCheckRunResultOperator(BaseOperator):
       1. job_id
       2. xcom_job_id_task (and optional xcom_job_id_key)
       3. run_date
-    If none are specified, defaults to evaluating the current day of checks.
+    If none are specified, defaults to evaluating the day before the worker's current date.
     """
+
+    template_fields = ("run_date",)
 
     def __init__(
         self,
@@ -42,7 +64,7 @@ class AnomaloCheckRunResultOperator(BaseOperator):
         job_id=None,
         xcom_job_id_task=None,
         xcom_job_id_key="return_value",
-        run_date: Optional[date] = None,
+        run_date: Optional[Union[date, str]] = None,
         anomalo_conn_id="anomalo_default",
         *args,
         **kwargs,
@@ -79,11 +101,7 @@ class AnomaloCheckRunResultOperator(BaseOperator):
         return job_id
 
     def _get_job_id_from_run_date(self):
-        run_date = (
-            self.run_date.strftime("%Y-%m-%d")
-            if self.run_date
-            else anomalo_today().strftime("%Y-%m-%d")
-        )
+        run_date = resolve_run_date(self.run_date)
         table_id = self.api_client.get_table_information(table_name=self.table_name)[
             "id"
         ]
@@ -102,7 +120,8 @@ class AnomaloPassFailOperator(AnomaloCheckRunResultOperator):
     :param job_id: (Optional) The job id of the job to evaluate.
     :param xcom_job_id_task: (Optional) The id of task that wrote the job id to check into xcom.
     :param xcom_job_id_key: (Optional) The xcom key under which the job id was written to.
-    :param run_date: (Optional) The run date of the checks to evaluate.
+    :param run_date: (Optional) The run date of the checks to evaluate, as a `date` or a
+        YYYY-MM-DD string. Templated, so `"{{ ds }}"` or `"{{ macros.ds_add(ds, -2) }}"` work.
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
 
     There are three optional ways to specify which checks to evaluate for pass/fail.
@@ -110,7 +129,7 @@ class AnomaloPassFailOperator(AnomaloCheckRunResultOperator):
       1. job_id
       2. xcom_job_id_task (and optional xcom_job_id_key)
       3. run_date
-    If none are specified, defaults to evaluating the current day of checks.
+    If none are specified, defaults to evaluating the day before the worker's current date.
     """
 
     def __init__(
@@ -120,7 +139,7 @@ class AnomaloPassFailOperator(AnomaloCheckRunResultOperator):
         job_id=None,
         xcom_job_id_task=None,
         xcom_job_id_key="return_value",
-        run_date: date = None,
+        run_date: Optional[Union[date, str]] = None,
         anomalo_conn_id="anomalo_default",
         *args,
         **kwargs,
@@ -163,15 +182,19 @@ class AnomaloRunCheckOperator(BaseOperator):
     Execution returns the job id of the run.
 
     :param table_name: the full name of the table in Anomalo.
-    :param run_date: (Optional) the day to run the checks on. If not specified, checks will run for the current day.
+    :param run_date: (Optional) the day to run the checks on, as a `date` or a YYYY-MM-DD string.
+        Templated, so `"{{ ds }}"` or `"{{ macros.ds_add(ds, -2) }}"` work. If not specified,
+        checks run for the day before the worker's current date.
     :param check_ids: (Optional) the ids of the checks to run. If not specified, all checks will be run, except DataFreshness and DataVolume.
     :param anomalo_conn_id: (Optional) The connection ID used to connect to Anomalo.
     """
 
+    template_fields = ("run_date",)
+
     def __init__(
         self,
         table_name,
-        run_date: date = None,
+        run_date: Optional[Union[date, str]] = None,
         check_ids=None,
         anomalo_conn_id="anomalo_default",
         *args,
@@ -186,11 +209,7 @@ class AnomaloRunCheckOperator(BaseOperator):
     def execute(self, context):
         api_client = AnomaloHook(anomalo_conn_id=self.anomalo_conn_id).get_client()
 
-        run_date_str = (
-            self.run_date.strftime("%Y-%m-%d")
-            if self.run_date
-            else anomalo_today().strftime("%Y-%m-%d")
-        )
+        run_date_str = resolve_run_date(self.run_date)
 
         table_id = api_client.get_table_information(table_name=self.table_name)["id"]
         run = api_client.run_checks(
